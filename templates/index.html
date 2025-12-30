@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            font-size: 0px;
+        }
+        .d1{
+            background-color: blueviolet;
+            width: 1200px;
+            height: 300px;
+            margin: 150px 0px;
+        }
+        img{
+            position: relative;
+            left: 10px;
+            top: 10px;
+        }
+        .s1{
+            position: relative;
+            font-size: 18px;
+            left: 15px;
+        color: white;;
+        }
+        .d2{
+            position: absolute;
+            width: 220px;
+            left: 120px;
+            top: 130px;
+            background-color: rgba(4, 165, 240, 0.7);
+
+        }
+        .d3{
+            height: 50px;
+            border: 1px solid;
+            border-color: rgba(171, 185, 199,0.7);
+
+        }
+        .s2{
+            position: relative;
+            left: 15px;
+            font-size: 15px;
+            color:white;
+            display: block;
+        }
+        .d4{
+            background-color: rgba(0, 151, 238,70%);
+            border: 1px solid;
+            border-color: rgba(171, 185, 199,0.7);
+        }
+        .s3{
+            position: relative;
+            left: 15px;
+            font-size: 13px;
+            color:rgba(171, 185, 199,0.7);
+
+            display: block;
+        }
+        .d5{
+            position: absolute;
+            display: none;
+            height: 252px;
+            width: 200px;
+            left: 220px;
+            top: 51px;
+            background-color: brown;
+        }
+
+        .d4:hover .d5{
+            display:block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="d1"></div>
+        <div class="d2">
+            <div class="d3">
+            <img src="./img/bt.png" alt="">
+            <span class="s1">全部课程 name:{{ name }}</span>
+                
+        </div>
+
+
+        <div class="d4">
+            <span class="s2">IT·互联网</span>
+            <span class="s3">前端开发Linux运维</span>
+            <div class="d5">
+                <span class="s2">IT·互联网</span>
+            </div>
+        </div>
+        <div class="d4">
+            <span class="s2">设计·创作</span>
+            <span class="s3">平面设计游戏美术设计CAD</span>
+            <div class="d5">
+                <span class="s2">设计·创作</span>
+            </div>
+        </div>
+        <div class="d4">
+            <span class="s2">语言·留学</span>
+            <span class="s3">实用口语雅思托福</span>
+            <div class="d5">
+                <span class="s2">语言·留学</span>
+            </div>
+        </div>
+        <div class="d4">
+            <span class="s2">职业考证</span>
+            <span class="s3">公务员教师考试建造工程</span>
+            <div class="d5">
+                <span class="s2">职业考证</span>
+            </div>
+        </div>
+        <div class="d4">
+            <span class="s2">升学·考研</span>
+            <span class="s3">考研大学高中初中</span>
+            <div class="d5">
+                <span class="s2">升学·考研</span>
+            </div>
+        </div>
+        <div class="d4">
+            <span class="s2">职业考证</span>
+            <span class="s3">兴趣·生活</span>
+            <div class="d5">
+                <span class="s2">职业考证</span>
+            </div>
+        </div>
+            
+
+    </div>
+</body>
+</html>
