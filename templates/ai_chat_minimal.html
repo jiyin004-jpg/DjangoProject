@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+
+{% block title %}AI助手 - 英语学习平台{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 2rem auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;">
+    
+    <!-- 头部 -->
+    <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 1rem 1.5rem;">
+        <h2 style="margin: 0;">🤖 AI英语学习助手</h2>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">在线 - 随时为您服务</p>
+    </div>
+    
+    <!-- 消息区域 -->
+    <div id="messages" style="height: 400px; padding: 1rem; overflow-y: auto; background: #f8f9fa;">
+        <div style="text-align: center; padding: 2rem; color: #666;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+            <h3 style="color: #4CAF50; margin-bottom: 1rem;">欢迎使用AI英语学习助手！</h3>
+            <p>我可以帮助您解答英语学习问题，提供学习建议。</p>
+            <p style="font-size: 0.9rem; color: #999;">请在下方输入您的问题...</p>
+        </div>
+    </div>
+    
+    <!-- 输入区域 -->
+    <div style="padding: 1rem; background: white; border-top: 1px solid #e0e0e0;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="输入您的问题..."
+                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid #e0e0e0; border-radius: 25px; outline: none; font-size: 1rem;"
+                onkeypress="if(event.key==='Enter') sendMsg()"
+            />
+            <button 
+                onclick="sendMsg()" 
+                style="background: #4CAF50; color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.2rem;"
+            >
+                ➤
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 简单的全局函数
+function addMsg(type, content) {
+    var messagesDiv = document.getElementById('messages');
+    
+    // 清除欢迎消息
+    if (messagesDiv.innerHTML.indexOf('欢迎使用') !== -1) {
+        messagesDiv.innerHTML = '';
+    }
+    
+    var msgDiv = document.createElement('div');
+    msgDiv.style.marginBottom = '1rem';
+    msgDiv.style.display = 'flex';
+    msgDiv.style.alignItems = 'flex-start';
+    msgDiv.style.gap = '0.5rem';
+    
+    if (type === 'user') {
+        msgDiv.style.flexDirection = 'row-reverse';
+    }
+    
+    var avatar = document.createElement('div');
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.display = 'flex';
+    avatar.style.alignItems = 'center';
+    avatar.style.justifyContent = 'center';
+    avatar.style.fontSize = '1.2rem';
+    avatar.style.flexShrink = '0';
+    avatar.textContent = type === 'user' ? '👤' : '🤖';
+    
+    if (type === 'user') {
+        avatar.style.background = '#4CAF50';
+        avatar.style.color = 'white';
+    } else {
+        avatar.style.background = '#2196F3';
+        avatar.style.color = 'white';
+    }
+    
+    var contentDiv = document.createElement('div');
+    contentDiv.style.maxWidth = '70%';
+    contentDiv.style.padding = '0.75rem 1rem';
+    contentDiv.style.borderRadius = '18px';
+    contentDiv.style.wordWrap = 'break-word';
+    contentDiv.textContent = content;
+    
+    if (type === 'user') {
+        contentDiv.style.background = '#4CAF50';
+        contentDiv.style.color = 'white';
+        contentDiv.style.borderBottomRightRadius = '4px';
+    } else {
+        contentDiv.style.background = 'white';
+        contentDiv.style.color = '#333';
+        contentDiv.style.border = '1px solid #e0e0e0';
+        contentDiv.style.borderBottomLeftRadius = '4px';
+    }
+    
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(contentDiv);
+    messagesDiv.appendChild(msgDiv);
+    
+    // 滚动到底部
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function sendMsg() {
+    var input = document.getElementById('messageInput');
+    var sendButton = document.querySelector('button[onclick="sendMsg()"]');
+    var message = input.value.trim();
+    
+    if (!message) {
+        return;
+    }
+    
+    // 禁用输入和按钮
+    input.disabled = true;
+    sendButton.disabled = true;
+    sendButton.style.opacity = '0.6';
+    sendButton.style.cursor = 'not-allowed';
+    sendButton.innerHTML = '⏳';
+    
+    // 添加用户消息
+    addMsg('user', message);
+    input.value = '';
+    
+    // 显示AI正在思考的动画
+    showAiThinking();
+    
+    // 发送到服务器
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/ai/chat/', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            // 恢复输入和按钮
+            input.disabled = false;
+            sendButton.disabled = false;
+            sendButton.style.opacity = '1';
+            sendButton.style.cursor = 'pointer';
+            sendButton.innerHTML = '➤';
+            input.focus(); // 重新聚焦到输入框
+            
+            // 隐藏思考动画
+            hideAiThinking();
+            
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        // 添加打字机效果
+                        addMsgWithTypewriter('ai', data.response);
+                    } else {
+                        addMsg('ai', '抱歉，我现在无法回答您的问题。');
+                    }
+                } catch (e) {
+                    addMsg('ai', '响应解析错误，请重试。');
+                }
+            } else {
+                addMsg('ai', '网络错误，请检查连接。');
+            }
+        }
+    };
+    
+    var requestData = JSON.stringify({
+        message: message,
+        history: []
+    });
+    
+    xhr.send(requestData);
+}
+
+function addMsgWithTypewriter(type, content) {
+    // 添加消息并使用打字机效果
+    var messagesDiv = document.getElementById('messages');
+    
+    // 清除欢迎消息
+    if (messagesDiv.innerHTML.indexOf('欢迎使用') !== -1) {
+        messagesDiv.innerHTML = '';
+    }
+    
+    var msgDiv = document.createElement('div');
+    msgDiv.style.marginBottom = '1rem';
+    msgDiv.style.display = 'flex';
+    msgDiv.style.alignItems = 'flex-start';
+    msgDiv.style.gap = '0.5rem';
+    msgDiv.style.opacity = '0';
+    msgDiv.style.transform = 'translateY(10px)';
+    msgDiv.style.transition = 'all 0.3s ease';
+    
+    if (type === 'user') {
+        msgDiv.style.flexDirection = 'row-reverse';
+    }
+    
+    var avatar = document.createElement('div');
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.display = 'flex';
+    avatar.style.alignItems = 'center';
+    avatar.style.justifyContent = 'center';
+    avatar.style.fontSize = '1.2rem';
+    avatar.style.flexShrink = '0';
+    avatar.textContent = type === 'user' ? '👤' : '🤖';
+    
+    if (type === 'user') {
+        avatar.style.background = '#4CAF50';
+        avatar.style.color = 'white';
+    } else {
+        avatar.style.background = '#2196F3';
+        avatar.style.color = 'white';
+    }
+    
+    var contentDiv = document.createElement('div');
+    contentDiv.style.maxWidth = '70%';
+    contentDiv.style.padding = '0.75rem 1rem';
+    contentDiv.style.borderRadius = '18px';
+    contentDiv.style.wordWrap = 'break-word';
+    contentDiv.style.lineHeight = '1.4';
+    
+    if (type === 'user') {
+        contentDiv.style.background = '#4CAF50';
+        contentDiv.style.color = 'white';
+        contentDiv.style.borderBottomRightRadius = '4px';
+        contentDiv.textContent = content;
+    } else {
+        contentDiv.style.background = 'white';
+        contentDiv.style.color = '#333';
+        contentDiv.style.border = '1px solid #e0e0e0';
+        contentDiv.style.borderBottomLeftRadius = '4px';
+        contentDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        
+        // 为AI回复添加打字机效果
+        contentDiv.innerHTML = '';
+        
+        // 添加光标
+        var cursor = document.createElement('span');
+        cursor.style.borderRight = '2px solid #4CAF50';
+        cursor.style.animation = 'blink 1s infinite';
+        cursor.innerHTML = '&nbsp;';
+        contentDiv.appendChild(cursor);
+        
+        // 添加打字机CSS动画
+        if (!document.getElementById('typewriter-style')) {
+            var style = document.createElement('style');
+            style.id = 'typewriter-style';
+            style.textContent = `
+                @keyframes blink {
+                    0%, 50% { border-color: transparent; }
+                    51%, 100% { border-color: #4CAF50; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(contentDiv);
+    messagesDiv.appendChild(msgDiv);
+    
+    // 淡入动画
+    setTimeout(() => {
+        msgDiv.style.opacity = '1';
+        msgDiv.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // 如果是AI回复，启动打字机效果
+    if (type === 'ai') {
+        typewriterEffect(contentDiv, content, cursor);
+    }
+    
+    // 滚动到底部
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function typewriterEffect(container, text, cursor) {
+    // 打字机效果
+    var index = 0;
+    var speed = 30; // 打字速度（毫秒）
+    
+    function typeChar() {
+        if (index < text.length) {
+            // 移除光标
+            if (cursor.parentNode) {
+                cursor.remove();
+            }
+            
+            // 添加字符
+            container.innerHTML += text.charAt(index);
+            
+            // 重新添加光标
+            container.appendChild(cursor);
+            
+            index++;
+            
+            // 滚动到底部
+            var messagesDiv = document.getElementById('messages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            setTimeout(typeChar, speed);
+        } else {
+            // 打字完成，移除光标
+            setTimeout(() => {
+                if (cursor.parentNode) {
+                    cursor.remove();
+                }
+            }, 1000);
+        }
+    }
+    
+    typeChar();
+}
+
+function showAiThinking() {
+    // 显示AI正在思考的动画
+    var messagesDiv = document.getElementById('messages');
+    
+    // 清除欢迎消息
+    if (messagesDiv.innerHTML.indexOf('欢迎使用') !== -1) {
+        messagesDiv.innerHTML = '';
+    }
+    
+    var thinkingDiv = document.createElement('div');
+    thinkingDiv.id = 'ai-thinking';
+    thinkingDiv.style.marginBottom = '1rem';
+    thinkingDiv.style.display = 'flex';
+    thinkingDiv.style.alignItems = 'flex-start';
+    thinkingDiv.style.gap = '0.5rem';
+    thinkingDiv.style.opacity = '0';
+    thinkingDiv.style.transform = 'translateY(10px)';
+    thinkingDiv.style.transition = 'all 0.3s ease';
+    
+    // AI头像
+    var avatar = document.createElement('div');
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.display = 'flex';
+    avatar.style.alignItems = 'center';
+    avatar.style.justifyContent = 'center';
+    avatar.style.fontSize = '1.2rem';
+    avatar.style.flexShrink = '0';
+    avatar.style.background = 'linear-gradient(45deg, #2196F3, #4CAF50)';
+    avatar.style.color = 'white';
+    avatar.style.animation = 'pulse 2s ease-in-out infinite';
+    avatar.textContent = '🤖';
+    
+    // 思考动画容器
+    var contentDiv = document.createElement('div');
+    contentDiv.style.maxWidth = '70%';
+    contentDiv.style.padding = '0.75rem 1rem';
+    contentDiv.style.borderRadius = '18px';
+    contentDiv.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
+    contentDiv.style.border = '1px solid #dee2e6';
+    contentDiv.style.borderBottomLeftRadius = '4px';
+    contentDiv.style.display = 'flex';
+    contentDiv.style.alignItems = 'center';
+    contentDiv.style.gap = '0.75rem';
+    contentDiv.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    
+    // 思考文本
+    var thinkingText = document.createElement('span');
+    thinkingText.textContent = 'AI正在思考中';
+    thinkingText.style.color = '#495057';
+    thinkingText.style.fontSize = '0.9rem';
+    thinkingText.style.fontWeight = '500';
+    
+    // 跳动的点点
+    var dotsContainer = document.createElement('div');
+    dotsContainer.style.display = 'flex';
+    dotsContainer.style.gap = '2px';
+    
+    for (let i = 0; i < 3; i++) {
+        var dot = document.createElement('div');
+        dot.style.width = '6px';
+        dot.style.height = '6px';
+        dot.style.borderRadius = '50%';
+        dot.style.background = '#4CAF50';
+        dot.style.animation = `bounce 1.4s ease-in-out ${i * 0.16}s infinite both`;
+        dotsContainer.appendChild(dot);
+    }
+    
+    // 转圈圈动画
+    var spinner = document.createElement('div');
+    spinner.style.width = '18px';
+    spinner.style.height = '18px';
+    spinner.style.border = '2px solid #e9ecef';
+    spinner.style.borderTop = '2px solid #4CAF50';
+    spinner.style.borderRadius = '50%';
+    spinner.style.animation = 'spin 1s linear infinite';
+    
+    // 添加CSS动画
+    if (!document.getElementById('thinking-animations')) {
+        var style = document.createElement('style');
+        style.id = 'thinking-animations';
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { 
+                    transform: scale(1);
+                    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+                }
+                50% { 
+                    transform: scale(1.05);
+                    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+                }
+            }
+            
+            @keyframes bounce {
+                0%, 80%, 100% {
+                    transform: scale(0);
+                    opacity: 0.5;
+                }
+                40% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    contentDiv.appendChild(thinkingText);
+    contentDiv.appendChild(dotsContainer);
+    contentDiv.appendChild(spinner);
+    
+    thinkingDiv.appendChild(avatar);
+    thinkingDiv.appendChild(contentDiv);
+    
+    messagesDiv.appendChild(thinkingDiv);
+    
+    // 动画进入效果
+    setTimeout(() => {
+        thinkingDiv.style.opacity = '1';
+        thinkingDiv.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // 滚动到底部
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    // 随机更新思考状态文本
+    var thinkingMessages = [
+        'AI正在思考中',
+        '正在分析您的问题',
+        '正在查找最佳答案',
+        '马上就好',
+        '正在整理回复'
+    ];
+    
+    var messageIndex = 0;
+    var thinkingInterval = setInterval(() => {
+        if (document.getElementById('ai-thinking')) {
+            messageIndex = (messageIndex + 1) % thinkingMessages.length;
+            thinkingText.textContent = thinkingMessages[messageIndex];
+        } else {
+            clearInterval(thinkingInterval);
+        }
+    }, 1500);
+    
+    // 存储interval ID以便清理
+    thinkingDiv.setAttribute('data-interval', thinkingInterval);
+}
+
+function hideAiThinking() {
+    // 隐藏AI思考动画
+    var thinkingDiv = document.getElementById('ai-thinking');
+    if (thinkingDiv) {
+        // 清理interval
+        var intervalId = thinkingDiv.getAttribute('data-interval');
+        if (intervalId) {
+            clearInterval(parseInt(intervalId));
+        }
+        
+        // 淡出动画
+        thinkingDiv.style.opacity = '0';
+        thinkingDiv.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            if (thinkingDiv.parentNode) {
+                thinkingDiv.remove();
+            }
+        }, 300);
+    }
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+
+{% block title %}功能演示 - 英语学习平台{% endblock %}
+
+{% block extra_css %}
+<!-- 演示页面专用favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" type="image/svg+xml">
+
+<style>
+.demo-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.demo-card:hover {
+    transform: translateY(-5px);
+}
+
+.demo-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.demo-button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.demo-output {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    min-height: 100px;
+    font-family: 'Courier New', monospace;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.word-card-demo {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 5px solid #4CAF50;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.word-card-demo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-hero">
+    <div class="card" style="text-align: center; background: linear-gradient(135deg, #FF6B6B, #4ECDC4); color: white; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%); animation: shimmer 3s infinite;"></div>
+        <div style="position: relative; z-index: 1; padding: 2rem 0;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                🎮 功能演示
+            </h1>
+            <p style="font-size: 1.3rem; opacity: 0.95; max-width: 500px; margin: 0 auto;">
+                体验我们平台的各种功能和特色
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="demo-section" style="margin-top: 2rem;">
+    <div class="demo-card">
+        <h2 style="color: #4CAF50; margin-bottom: 1rem;">📚 单词学习演示</h2>
+        <p style="color: #666; margin-bottom: 1rem;">
+            模拟单词学习过程，展示单词卡片的交互效果
+        </p>
+        
+        <div style="margin-bottom: 1rem;">
+            <button class="demo-button" onclick="showRandomWord()">🎲 随机单词</button>
+            <button class="demo-button" onclick="showWordList()">📋 单词列表</button>
+            <button class="demo-button" onclick="clearDemo()">🗑️ 清空</button>
+        </div>
+        
+        <div id="wordDemo" class="demo-output">
+            点击上方按钮开始演示...
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2 style="color: #2196F3; margin-bottom: 1rem;">⚡ 分页加载演示</h2>
+        <p style="color: #666; margin-bottom: 1rem;">
+            演示我们的智能分页系统如何快速加载大量数据
+        </p>
+        
+        <div style="margin-bottom: 1rem;">
+            <button class="demo-button" onclick="simulateLoading()">🔄 模拟加载</button>
+            <button class="demo-button" onclick="showPagination()">📄 分页控制</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        
+        <div id="loadingDemo" class="demo-output">
+            准备演示分页加载...
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2 style="color: #FF9800; margin-bottom: 1rem;">🎯 搜索功能演示</h2>
+        <p style="color: #666; margin-bottom: 1rem;">
+            体验智能搜索功能，快速找到目标单词
+        </p>
+        
+        <div style="margin-bottom: 1rem;">
+            <input type="text" id="searchInput" placeholder="输入单词进行搜索..." 
+                   style="padding: 10px; border: 2px solid #ddd; border-radius: 25px; width: 300px; margin-right: 10px;">
+            <button class="demo-button" onclick="performSearch()">🔍 搜索</button>
+        </div>
+        
+        <div id="searchDemo" class="demo-output">
+            在上方输入框中输入单词进行搜索...
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2 style="color: #9C27B0; margin-bottom: 1rem;">📊 学习统计演示</h2>
+        <p style="color: #666; margin-bottom: 1rem;">
+            查看学习进度和统计数据
+        </p>
+        
+        <div style="margin-bottom: 1rem;">
+            <button class="demo-button" onclick="showStats()">📈 显示统计</button>
+            <button class="demo-button" onclick="updateProgress()">⬆️ 更新进度</button>
+        </div>
+        
+        <div id="statsDemo" class="demo-output">
+            点击按钮查看学习统计...
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2 style="color: #607D8B; margin-bottom: 1rem;">🎨 主题切换演示</h2>
+        <p style="color: #666; margin-bottom: 1rem;">
+            体验不同的界面主题和颜色方案
+        </p>
+        
+        <div style="margin-bottom: 1rem;">
+            <button class="demo-button" onclick="changeTheme('green')" style="background: #4CAF50;">🟢 绿色主题</button>
+            <button class="demo-button" onclick="changeTheme('blue')" style="background: #2196F3;">🔵 蓝色主题</button>
+            <button class="demo-button" onclick="changeTheme('purple')" style="background: #9C27B0;">🟣 紫色主题</button>
+            <button class="demo-button" onclick="changeTheme('orange')" style="background: #FF9800;">🟠 橙色主题</button>
+        </div>
+        
+        <div id="themeDemo" class="demo-output">
+            当前主题：默认绿色主题
+        </div>
+    </div>
+</div>
+
+<div class="cta-section" style="margin-top: 3rem; text-align: center;">
+    <div class="card">
+        <h2 style="color: #4CAF50; margin-bottom: 1rem;">🚀 准备开始学习了吗？</h2>
+        <p style="margin-bottom: 2rem; color: #666;">
+            体验完功能演示后，立即开始您的英语学习之旅！
+        </p>
+        <a href="{% url 'vocabulary' %}" class="btn" style="font-size: 1.2rem; padding: 15px 30px;">
+            📖 进入单词本
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 演示数据
+const demoWords = [
+    {word: 'abandon', translation: '放弃，抛弃', meaning: '完全放弃；永久离开或抛弃某物'},
+    {word: 'ability', translation: '能力，才能', meaning: '做某事的能力、技能或力量'},
+    {word: 'abroad', translation: '在国外，到国外', meaning: '在外国或到外国'},
+    {word: 'absolute', translation: '绝对的，完全的', meaning: '完全的、彻底的；不受任何限制的'},
+    {word: 'academic', translation: '学术的，理论的', meaning: '与教育和学术研究相关的'}
+];
+
+let currentTheme = 'green';
+let learnedWords = 0;
+
+// 随机单词演示
+function showRandomWord() {
+    const randomWord = demoWords[Math.floor(Math.random() * demoWords.length)];
+    const output = document.getElementById('wordDemo');
+    
+    output.innerHTML = `
+        <div class="word-card-demo">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 1.5em; font-weight: bold;">${randomWord.word}</span>
+                <span style="background: #4CAF50; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9em;">CET-4</span>
+            </div>
+            <div style="font-size: 1.2em; font-weight: bold; color: #2E7D32; margin-bottom: 8px;">${randomWord.translation}</div>
+            <div style="color: #666;">${randomWord.meaning}</div>
+        </div>
+        <p style="margin-top: 1rem; color: #4CAF50; font-weight: bold;">✨ 点击单词卡片可以进行互动！</p>
+    `;
+}
+
+// 单词列表演示
+function showWordList() {
+    const output = document.getElementById('wordDemo');
+    let html = '<h3 style="color: #4CAF50; margin-bottom: 1rem;">📚 单词列表预览</h3>';
+    
+    demoWords.forEach((word, index) => {
+        html += `
+            <div class="word-card-demo" onclick="selectWord(${index})">
+                <strong>${word.word}</strong> - ${word.translation}
+            </div>
+        `;
+    });
+    
+    output.innerHTML = html;
+}
+
+// 选择单词
+function selectWord(index) {
+    const word = demoWords[index];
+    alert(`您选择了单词: ${word.word}\\n翻译: ${word.translation}\\n释义: ${word.meaning}`);
+}
+
+// 清空演示
+function clearDemo() {
+    document.getElementById('wordDemo').innerHTML = '演示已清空，点击上方按钮重新开始...';
+}
+
+// 模拟加载
+function simulateLoading() {
+    const output = document.getElementById('loadingDemo');
+    const progressFill = document.getElementById('progressFill');
+    
+    output.innerHTML = '🔄 正在加载单词数据...';
+    progressFill.style.width = '0%';
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            output.innerHTML = `
+                ✅ 加载完成！<br>
+                📊 已加载 2500 个CET-4单词<br>
+                📊 已加载 1200 个CET-6单词<br>
+                ⚡ 加载时间: 0.8秒
+            `;
+        }
+        progressFill.style.width = progress + '%';
+    }, 100);
+}
+
+// 分页控制演示
+function showPagination() {
+    const output = document.getElementById('loadingDemo');
+    output.innerHTML = `
+        <h3 style="color: #2196F3; margin-bottom: 1rem;">📄 分页控制</h3>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+            <button onclick="alert('上一页')" style="padding: 5px 10px; border: 1px solid #2196F3; background: white; color: #2196F3; border-radius: 5px;">上一页</button>
+            <span>第 1 页 / 共 125 页</span>
+            <button onclick="alert('下一页')" style="padding: 5px 10px; border: 1px solid #2196F3; background: #2196F3; color: white; border-radius: 5px;">下一页</button>
+            <input type="number" placeholder="页码" style="width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+            <button onclick="alert('跳转')" style="padding: 5px 10px; border: 1px solid #2196F3; background: #2196F3; color: white; border-radius: 5px;">跳转</button>
+        </div>
+        <p style="color: #666;">每页显示 20 个单词，支持快速跳转到任意页面</p>
+    `;
+}
+
+// 搜索功能
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const output = document.getElementById('searchDemo');
+    
+    if (!searchTerm) {
+        output.innerHTML = '❌ 请输入搜索关键词';
+        return;
+    }
+    
+    const results = demoWords.filter(word => 
+        word.word.toLowerCase().includes(searchTerm) || 
+        word.translation.includes(searchTerm)
+    );
+    
+    if (results.length > 0) {
+        let html = `<h3 style="color: #FF9800;">🔍 搜索结果 (${results.length}个)</h3>`;
+        results.forEach(word => {
+            html += `
+                <div class="word-card-demo">
+                    <strong>${word.word}</strong> - ${word.translation}
+                </div>
+            `;
+        });
+        output.innerHTML = html;
+    } else {
+        output.innerHTML = `❌ 未找到包含 "${searchTerm}" 的单词`;
+    }
+}
+
+// 显示统计
+function showStats() {
+    const output = document.getElementById('statsDemo');
+    const totalWords = 3700;
+    const studiedWords = Math.floor(Math.random() * 500) + 100;
+    const todayWords = Math.floor(Math.random() * 50) + 10;
+    
+    output.innerHTML = `
+        <h3 style="color: #9C27B0; margin-bottom: 1rem;">📊 学习统计</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #4CAF50;">${totalWords}</div>
+                <div>总词汇量</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #2196F3;">${studiedWords}</div>
+                <div>已学习</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #FF9800;">${todayWords}</div>
+                <div>今日学习</div>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #9C27B0;">${Math.round(studiedWords/totalWords*100)}%</div>
+                <div>完成度</div>
+            </div>
+        </div>
+    `;
+}
+
+// 更新进度
+function updateProgress() {
+    learnedWords += Math.floor(Math.random() * 10) + 1;
+    showStats();
+}
+
+// 主题切换
+function changeTheme(theme) {
+    const output = document.getElementById('themeDemo');
+    const themeColors = {
+        green: '#4CAF50',
+        blue: '#2196F3',
+        purple: '#9C27B0',
+        orange: '#FF9800'
+    };
+    
+    const themeNames = {
+        green: '绿色主题',
+        blue: '蓝色主题',
+        purple: '紫色主题',
+        orange: '橙色主题'
+    };
+    
+    currentTheme = theme;
+    const color = themeColors[theme];
+    
+    output.innerHTML = `
+        <div style="padding: 1rem; background: ${color}; color: white; border-radius: 8px; margin-bottom: 1rem;">
+            <h3>🎨 ${themeNames[theme]}</h3>
+            <p>这是${themeNames[theme]}的预览效果</p>
+        </div>
+        <p>当前主题：${themeNames[theme]}</p>
+        <p style="color: #666; font-size: 0.9rem;">注：实际应用中主题会影响整个界面的颜色方案</p>
+    `;
+}
+
+// 页面加载完成后绑定事件
+document.addEventListener('DOMContentLoaded', function() {
+    // 搜索框回车事件
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+    
+    console.log('Demo page loaded');
+});
+</script>
+{% endblock %}

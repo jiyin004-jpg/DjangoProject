@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}首页 - 英语学习平台{% endblock %}
+
+{% block extra_css %}
+<!-- 主页专用favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" type="image/svg+xml">
+{% endblock %}
+
+{% block content %}
+<!-- 公告区域 -->
+{% if announcements %}
+<div class="announcements-section" style="margin-bottom: 2rem;">
+    <!-- 公告区域标题 -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+        <span style="background: rgba(255,255,255,0.9); color: #666; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            📢 平台公告
+        </span>
+    </div>
+    
+    {% for announcement in announcements %}
+    <div class="card" style="background: linear-gradient(135deg, #ff9800, #f57c00); color: white; margin-bottom: 1rem; position: relative; overflow: hidden;">
+        <div style="position: relative; z-index: 1;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <span style="font-size: 1.5rem;">📢</span>
+                <h3 style="margin: 0; font-size: 1.3rem;">{{ announcement.title }}</h3>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; opacity: 0.8;">
+                        公告
+                    </span>
+                    <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem;">
+                        {{ announcement.created_at|date:"Y-m-d" }}
+                    </span>
+                </div>
+            </div>
+            <p style="margin: 0; line-height: 1.5; opacity: 0.95;">{{ announcement.content }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="hero-section">
+    <div class="card" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: relative; overflow: hidden;">
+        <div style="position: relative; z-index: 1;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 1rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                🎓 欢迎来到英语学习平台
+            </h1>
+            <p style="font-size: 1.4rem; margin-bottom: 2.5rem; opacity: 0.95; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                专业的英语四六级词汇学习工具，助您轻松掌握核心词汇，提升英语水平
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'vocabulary' %}" class="btn" style="background: white; color: #667eea; font-size: 1.2rem; padding: 15px 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+                    🚀 开始学习
+                </a>
+                <a href="{% url 'demo' %}" class="btn" style="background: rgba(255,255,255,0.2); color: white; font-size: 1.2rem; padding: 15px 30px; border: 2px solid white;">
+                    🎮 功能演示
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section" style="margin-top: 3rem;">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: white; font-size: 2.5rem;">✨ 平台特色</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div class="card">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                <h3 style="color: #4CAF50; margin-bottom: 1rem;">丰富词汇库</h3>
+                <p>包含CET-4和CET-6核心词汇，每个单词都有详细的中英文释义，帮助您全面理解单词含义。</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                <h3 style="color: #4CAF50; margin-bottom: 1rem;">智能搜索</h3>
+                <p>支持中英文搜索，数字搜索功能，快速找到您需要的单词，提高学习效率。</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                <h3 style="color: #4CAF50; margin-bottom: 1rem;">响应式设计</h3>
+                <p>完美适配手机、平板和电脑，随时随地都能进行英语学习。</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                <h3 style="color: #4CAF50; margin-bottom: 1rem;">精准分级</h3>
+                <p>严格按照CET-4和CET-6标准分类，针对性学习，提高备考效率。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="stats-section" style="margin-top: 3rem;">
+    <div class="card" style="background: linear-gradient(135deg, #2196F3, #1976D2); color: white; text-align: center;">
+        <h2 style="margin-bottom: 2rem;">📊 学习数据</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+            <div>
+                <div style="font-size: 2.5rem; font-weight: bold;">{{ local_cet4|default:"576" }}+</div>
+                <div style="opacity: 0.9;">CET-4 词汇</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: bold;">{{ local_cet6|default:"197" }}+</div>
+                <div style="opacity: 0.9;">CET-6 词汇</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: bold;">{{ total_local|default:"773" }}+</div>
+                <div style="opacity: 0.9;">总词汇量</div>
+            </div>
+            <div>
+                <div style="font-size: 2.5rem; font-weight: bold;">24/7</div>
+                <div style="opacity: 0.9;">随时学习</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section" style="margin-top: 3rem; text-align: center;">
+    <div class="card">
+        <h2 style="color: #4CAF50; margin-bottom: 1rem;">🎉 立即开始您的英语学习之旅</h2>
+        <p style="margin-bottom: 2rem; font-size: 1.1rem; color: #666;">
+            加入我们，让英语学习变得更加高效和有趣！
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'vocabulary' %}" class="btn">📖 进入单词本</a>
+            <a href="{% url 'demo' %}" class="btn btn-secondary">🎮 功能演示</a>
+        </div>
+    </div>
+</div>
+
+<!-- 管理员登录入口 -->
+<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1000;">
+    <a href="/admin/" style="background: rgba(0,0,0,0.7); color: white; padding: 10px 15px; border-radius: 25px; text-decoration: none; font-size: 0.9rem; transition: all 0.3s ease;" 
+       onmouseover="this.style.background='rgba(0,0,0,0.9)'" 
+       onmouseout="this.style.background='rgba(0,0,0,0.7)'">
+        🔐 管理员登录
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 首页的交互功能
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Home page loaded');
+    
+    // 添加特色卡片的悬停动画效果
+    const featureCards = document.querySelectorAll('.features-section .card');
+    
+    featureCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+            this.style.transition = 'all 0.3s ease';
+            this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+        });
+    });
+    
+    // 数字动画效果
+    const statsNumbers = document.querySelectorAll('.stats-section [style*="font-size: 2.5rem"]');
+    
+    const animateNumber = (element, target) => {
+        const increment = target / 50;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            
+            if (target.toString().includes('+')) {
+                element.textContent = Math.floor(current) + '+';
+            } else {
+                element.textContent = current.toString();
+            }
+        }, 30);
+    };
+    
+    // 使用 Intersection Observer 来触发数字动画
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const text = entry.target.textContent;
+                const number = parseInt(text.replace(/[^0-9]/g, ''));
+                
+                if (!isNaN(number) && number > 0) {
+                    animateNumber(entry.target, number);
+                    observer.unobserve(entry.target);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    statsNumbers.forEach(num => observer.observe(num));
+});
+</script>
+{% endblock %}
