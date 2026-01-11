@@ -17,10 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 
-from app01 import urls as app01_urls
+from word import urls as word_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('app01/',include(app01_urls)),
-
+    path('', include(word_urls)),  # 将word应用设为根路径
+    path('word/', include(word_urls)),  # 保留原路径以兼容
 ]
